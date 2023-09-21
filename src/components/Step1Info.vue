@@ -58,10 +58,127 @@
 
 <script>
 // @ is an alias to /src
-import { defineComponent, ref } from "vue";
-import { mapGetters, mapState, mapActions } from "vuex";
+import { defineComponent, ref, computed } from "vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
+  name: "Step1Info",
+  setup(props, { emit }) {
+    const store = useStore();
+
+    const formStep1 = ref(null);
+
+    const name = computed({
+      get() {
+        return store.getters["Step/step1Name"];
+      },
+      set(value) {
+        const objValue = { value, prop: "name" };
+        store.dispatch("Step/setStep1", objValue);
+      },
+    });
+
+    const email = computed({
+      get() {
+        return store.getters["Step/step1Email"];
+      },
+      set(value) {
+        const objValue = { value, prop: "email" };
+        store.dispatch("Step/setStep1", objValue);
+      },
+    });
+
+    const phoneNumber = computed({
+      get() {
+        return store.getters["Step/step1PhoneNumber"];
+      },
+      set(value) {
+        const objValue = { value, prop: "phoneNumber" };
+        store.dispatch("Step/setStep1", objValue);
+      },
+    });
+
+    const submitForm = async () => {
+      const response = await formStep1.value.validate();
+      if (response) {
+        emit("stepTo", 2);
+      }
+    };
+
+    const verificaEmailValidacoes = (email) => {
+      if (!validaEmail(email)) {
+        return "Insira um e-mail válido";
+      }
+      return true;
+    };
+
+    const validaEmail = (email) => {
+      var re =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(email);
+    };
+
+    const validarCelular = (celular) => {
+      if (!celular || celular.length !== 11) {
+        return "Esse campo deve possuir 11 dígitos";
+      }
+      if (
+        celular.substring(0, 2) === "00" ||
+        celular.substring(0, 2) === "01" ||
+        celular.substring(0, 2) === "02" ||
+        celular.substring(0, 2) === "03" ||
+        celular.substring(0, 2) === "04" ||
+        celular.substring(0, 2) === "05" ||
+        celular.substring(0, 2) === "06" ||
+        celular.substring(0, 2) === "07" ||
+        celular.substring(0, 2) === "08" ||
+        celular.substring(0, 2) === "09" ||
+        celular.substring(0, 2) === "10" ||
+        celular.substring(0, 2) === "20" ||
+        celular.substring(0, 2) === "23" ||
+        celular.substring(0, 2) === "25" ||
+        celular.substring(0, 2) === "26" ||
+        celular.substring(0, 2) === "29" ||
+        celular.substring(0, 2) === "30" ||
+        celular.substring(0, 2) === "36" ||
+        celular.substring(0, 2) === "39" ||
+        celular.substring(0, 2) === "40" ||
+        celular.substring(0, 2) === "50" ||
+        celular.substring(0, 2) === "52" ||
+        celular.substring(0, 2) === "56" ||
+        celular.substring(0, 2) === "57" ||
+        celular.substring(0, 2) === "58" ||
+        celular.substring(0, 2) === "59" ||
+        celular.substring(0, 2) === "60" ||
+        celular.substring(0, 2) === "70" ||
+        celular.substring(0, 2) === "72" ||
+        celular.substring(0, 2) === "76" ||
+        celular.substring(0, 2) === "78" ||
+        celular.substring(0, 2) === "80" ||
+        celular.substring(0, 2) === "90"
+      ) {
+        return "Insira um DDD válido.";
+      }
+      if (celular.substring(2, 3) !== "9") {
+        return "Depois do DDD, o número de celular deve começar com 9";
+      }
+      return true;
+    };
+
+    return {
+      formStep1,
+      name,
+      email,
+      phoneNumber,
+      submitForm,
+      verificaEmailValidacoes,
+      validaEmail,
+      validarCelular,
+    };
+  },
+});
+
+/*export default defineComponent({
   name: "IndexPage",
   setup() {
     return {
@@ -110,7 +227,6 @@ export default defineComponent({
         this.$emit("stepTo", 2);
       }
     },
-    setStep1Func() {},
     verificaEmailValidacoes(email) {
       if (!this.validaEmail(email)) {
         return "Insira um e-mail válido";
@@ -170,6 +286,7 @@ export default defineComponent({
     },
   },
 });
+*/
 </script>
 
 <style></style>

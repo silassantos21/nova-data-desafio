@@ -64,14 +64,30 @@
 </template>
 
 <script>
-// import { mapState } from 'vuex'
-export default {
-  props: ["actualStep"],
+import { defineComponent, ref, computed } from "vue";
+
+export default defineComponent({
   name: "StepperComponent",
-  computed: {
-    step() {
-      return this.actualStep;
-    },
+  props: {
+    actualStep: Number,
   },
-};
+  setup(props, { emit }) {
+    const step = computed(() => {
+      return props.actualStep;
+    });
+    return {
+      step,
+    };
+  },
+});
+
+// export default {
+//   props: ["actualStep"],
+//   name: "StepperComponent",
+//   computed: {
+//     step() {
+//       return this.actualStep;
+//     },
+//   },
+// };
 </script>

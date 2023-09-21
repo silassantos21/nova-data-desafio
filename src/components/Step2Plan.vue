@@ -84,108 +84,180 @@
 
 <script>
 // @ is an alias to /src
-import { defineComponent, ref } from "vue";
-import { mapGetters, mapState, mapActions } from "vuex";
-
-const plans = [
-  {
-    name: "Arcade",
-    value: 9,
-    freeMonths: null,
-    planType: "Monthly",
-  },
-  {
-    name: "Advanced",
-    value: 12,
-    freeMonths: null,
-    planType: "Monthly",
-  },
-  {
-    name: "Pro",
-    value: 15,
-    freeMonths: null,
-    planType: "Monthly",
-  },
-  {
-    name: "Arcade",
-    value: 90,
-    freeMonths: 2,
-    planType: "Yearly",
-  },
-  {
-    name: "Advanced",
-    value: 120,
-    freeMonths: 2,
-    planType: "Yearly",
-  },
-  {
-    name: "Pro",
-    value: 150,
-    freeMonths: 2,
-    planType: "Yearly",
-  },
-];
+import { defineComponent, ref, computed, onMounted, watch } from "vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
-  name: "IndexPage",
+  name: "Step1Info",
   setup() {
-    return {
-      planType: ref("Monthly"),
-      selectedPlan: ref(""),
-      selectedIndex: ref(null),
-      name: ref(""),
-      email: ref(""),
-      phoneNumber: ref(""),
-      isStateChange: ref(false),
-      plans,
-    };
-  },
-  mounted() {
-    this.setStatePlan();
-  },
-  watch: {
-    planType() {
-      if (!this.isStateChange) {
-        this.selectedPlan = "";
-        this.selectedIndex = null;
-      } else {
-        this.isStateChange = false;
-      }
-    },
-    selectedPlanObject(newValue) {
-      this.setStep2(newValue);
-    },
-  },
-  computed: {
-    ...mapState("Step", ["step2"]),
-    selectedPlanObject() {
+    const store = useStore();
+
+    const plans = ref([
+      {
+        name: "Arcade",
+        value: 9,
+        freeMonths: null,
+        planType: "Monthly",
+      },
+      {
+        name: "Advanced",
+        value: 12,
+        freeMonths: null,
+        planType: "Monthly",
+      },
+      {
+        name: "Pro",
+        value: 15,
+        freeMonths: null,
+        planType: "Monthly",
+      },
+      {
+        name: "Arcade",
+        value: 90,
+        freeMonths: 2,
+        planType: "Yearly",
+      },
+      {
+        name: "Advanced",
+        value: 120,
+        freeMonths: 2,
+        planType: "Yearly",
+      },
+      {
+        name: "Pro",
+        value: 150,
+        freeMonths: 2,
+        planType: "Yearly",
+      },
+    ]);
+
+    const planType = ref("Monthly");
+    const selectedPlan = ref("");
+    const selectedIndex = ref(null);
+    const isStateChange = ref(false);
+
+    const formStep1 = ref(null);
+
+    onMounted(() => {
+      setStatePlan();
+    });
+
+    const step2 = computed(() => {
+      return store.getters["Step/step2"];
+    });
+
+    const selectedPlanObject = computed(() => {
       const emptyPlanObject = {
         name: "",
         value: 0,
         freeMonths: 0,
         planType: "",
       };
-      return plans[this.selectedIndex] ?? emptyPlanObject;
-    },
-  },
-  methods: {
-    ...mapActions("Step", ["setStep2"]),
-    setStatePlan() {
-      if (this.step2.name) {
-        this.isStateChange = true;
-        this.planType = this.step2.planType;
-        const selectedIndex = plans.findIndex((item) => {
-          return item.name === this.step2.name;
-        });
-        this.setPlan(this.step2.name, selectedIndex);
+      return plans.value[selectedIndex.value] ?? emptyPlanObject;
+    });
+
+    watch(planType, () => {
+      if (!isStateChange.value) {
+        selectedPlan.value = "";
+        selectedIndex.value = null;
+      } else {
+        isStateChange.value = false;
       }
-    },
-    setPlan(plan, index) {
-      this.selectedPlan = plan;
-      this.selectedIndex = index;
-    },
+    });
+
+    watch(selectedPlanObject, (newValue) => {
+      store.dispatch("Step/setStep2", newValue);
+    });
+
+    const setStatePlan = () => {
+      if (step2.value.name) {
+        isStateChange.value = true;
+        planType.value = step2.value.planType;
+        const selectedIndex = plans.value.findIndex((item) => {
+          return item.name === step2.value.name;
+        });
+        setPlan(step2.value.name, selectedIndex);
+        isStateChange.value = false;
+      }
+    };
+
+    const setPlan = (plan, index) => {
+      selectedPlan.value = plan;
+      selectedIndex.value = index;
+    };
+
+    return {
+      plans,
+      planType,
+      selectedPlan,
+      selectedIndex,
+      isStateChange,
+      formStep1,
+      step2,
+      selectedPlanObject,
+      setStatePlan,
+      setPlan,
+    };
   },
 });
+
+// export default defineComponent({
+//   name: "IndexPage",
+//   setup() {
+//     return {
+//       planType: ref("Monthly"),
+//       selectedPlan: ref(""),
+//       selectedIndex: ref(null),
+//       isStateChange: ref(false),
+//       plans,
+//     };
+//   },
+//   mounted() {
+//     this.setStatePlan();
+//   },
+//   watch: {
+//     planType() {
+//       if (!this.isStateChange) {
+//         this.selectedPlan = "";
+//         this.selectedIndex = null;
+//       } else {
+//         this.isStateChange = false;
+//       }
+//     },
+//     selectedPlanObject(newValue) {
+//       this.setStep2(newValue);
+//     },
+//   },
+//   computed: {
+//     ...mapState("Step", ["step2"]),
+//     selectedPlanObject() {
+//       const emptyPlanObject = {
+//         name: "",
+//         value: 0,
+//         freeMonths: 0,
+//         planType: "",
+//       };
+//       return plans[this.selectedIndex] ?? emptyPlanObject;
+//     },
+//   },
+//   methods: {
+//     ...mapActions("Step", ["setStep2"]),
+//     setStatePlan() {
+//       if (this.step2.name) {
+//         this.isStateChange = true;
+//         this.planType = this.step2.planType;
+//         const selectedIndex = plans.findIndex((item) => {
+//           return item.name === this.step2.name;
+//         });
+//         this.setPlan(this.step2.name, selectedIndex);
+//       }
+//     },
+//     setPlan(plan, index) {
+//       this.selectedPlan = plan;
+//       this.selectedIndex = index;
+//     },
+//   },
+// });
 </script>
 
 <style></style>

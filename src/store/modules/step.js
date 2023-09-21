@@ -31,9 +31,9 @@ const Step = {
     },
   },
   getters: {
-    // setStep1: (state) => {
-    //   return state.step1;
-    // },
+    setStep1: (state) => {
+      return state.step1;
+    },
     step1Name: (state) => {
       return state.step1.name;
     },
@@ -45,6 +45,9 @@ const Step = {
     },
     step2: (state) => {
       return state.step2;
+    },
+    step3: (state) => {
+      return state.step3;
     },
     step3isOnlineService: (state) => {
       return state.step3.isOnlineService;

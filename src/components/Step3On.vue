@@ -117,45 +117,98 @@
 
 <script>
 // @ is an alias to /src
-import { defineComponent, ref } from "vue";
-import { mapGetters, mapState, mapActions } from "vuex";
+import { defineComponent, computed } from "vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
-  name: "IndexPage",
-  computed: {
-    ...mapState("Step", ["step2", "step3"]),
-    planType() {
-      return this.step2.planType;
-    },
-    isOnlineService: {
+  name: "Step1Info",
+  setup() {
+    const store = useStore();
+
+    const step2 = computed(() => {
+      return store.getters["Step/step2"];
+    });
+
+    const planType = computed(() => {
+      return step2.value.planType;
+    });
+
+    const isOnlineService = computed({
       get() {
-        return this.$store.getters["Step/step3isOnlineService"];
+        return store.getters["Step/step3isOnlineService"];
       },
       set(value) {
         const objValue = { value, prop: "isOnlineService" };
-        this.$store.dispatch("Step/setStep3", objValue);
+        store.dispatch("Step/setStep3", objValue);
       },
-    },
-    isLargerStorage: {
+    });
+
+    const isLargerStorage = computed({
       get() {
-        return this.$store.getters["Step/step3isLargerStorage"];
+        return store.getters["Step/step3isLargerStorage"];
       },
       set(value) {
         const objValue = { value, prop: "isLargerStorage" };
-        this.$store.dispatch("Step/setStep3", objValue);
+        store.dispatch("Step/setStep3", objValue);
       },
-    },
-    isCustomizableProfile: {
+    });
+
+    const isCustomizableProfile = computed({
       get() {
-        return this.$store.getters["Step/step3isCustomizableProfile"];
+        return store.getters["Step/step3isCustomizableProfile"];
       },
       set(value) {
         const objValue = { value, prop: "isCustomizableProfile" };
-        this.$store.dispatch("Step/setStep3", objValue);
+        store.dispatch("Step/setStep3", objValue);
       },
-    },
+    });
+
+    return {
+      step2,
+      planType,
+      isOnlineService,
+      isLargerStorage,
+      isCustomizableProfile,
+    };
   },
 });
+
+// export default defineComponent({
+//   name: "IndexPage",
+//   computed: {
+//     ...mapState("Step", ["step2"]),
+//     planType() {
+//       return this.step2.planType;
+//     },
+//     isOnlineService: {
+//       get() {
+//         return this.$store.getters["Step/step3isOnlineService"];
+//       },
+//       set(value) {
+//         const objValue = { value, prop: "isOnlineService" };
+//         this.$store.dispatch("Step/setStep3", objValue);
+//       },
+//     },
+//     isLargerStorage: {
+//       get() {
+//         return this.$store.getters["Step/step3isLargerStorage"];
+//       },
+//       set(value) {
+//         const objValue = { value, prop: "isLargerStorage" };
+//         this.$store.dispatch("Step/setStep3", objValue);
+//       },
+//     },
+//     isCustomizableProfile: {
+//       get() {
+//         return this.$store.getters["Step/step3isCustomizableProfile"];
+//       },
+//       set(value) {
+//         const objValue = { value, prop: "isCustomizableProfile" };
+//         this.$store.dispatch("Step/setStep3", objValue);
+//       },
+//     },
+//   },
+// });
 </script>
 
 <style></style>

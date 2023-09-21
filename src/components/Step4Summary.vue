@@ -76,66 +76,154 @@
 
 <script>
 // @ is an alias to /src
-import { defineComponent, ref } from "vue";
-import { mapGetters, mapState, mapActions } from "vuex";
+import { defineComponent, ref, computed } from "vue";
+import { useStore } from "vuex";
 
 export default defineComponent({
-  name: "IndexPage",
-  computed: {
-    ...mapState("Step", ["step1", "step2", "step3"]),
-    isOnlineServiceValue() {
-      return this.step2.planType === "Monthly"
-        ? this.step3.isOnlineService.monthlyValue
-        : this.step3.isOnlineService.yearlyValue;
-    },
-    isLargerStorageValue() {
-      return this.step2.planType === "Monthly"
-        ? this.step3.isLargerStorage.monthlyValue
-        : this.step3.isLargerStorage.yearlyValue;
-    },
-    isCustomizableProfileValue() {
-      return this.step2.planType === "Monthly"
-        ? this.step3.isCustomizableProfile.monthlyValue
-        : this.step3.isCustomizableProfile.yearlyValue;
-    },
-    valueSufix() {
-      return this.step2.planType === "Monthly" ? "mo" : "yr";
-    },
-    onlineServiceCondition() {
-      return `+$${this.isOnlineServiceValue}/${this.valueSufix}`;
-    },
-    largerStorageCondition() {
-      return `+$${this.isLargerStorageValue}/${this.valueSufix}`;
-    },
-    customizableProfileCondition() {
-      return `+$${this.isCustomizableProfileValue}/${this.valueSufix}`;
-    },
-    totalPlan() {
-      const isOnlineServiceValue = this.step3.isOnlineService.isActive
-        ? this.isOnlineServiceValue
+  name: "Step1Info",
+  setup(props, { emit }) {
+    const store = useStore();
+
+    const step2 = computed(() => {
+      return store.getters["Step/step2"];
+    });
+
+    const step3 = computed(() => {
+      return store.getters["Step/step3"];
+    });
+
+    const isOnlineServiceValue = computed(() => {
+      return step2.value.planType === "Monthly"
+        ? step3.value.isOnlineService.monthlyValue
+        : step3.value.isOnlineService.yearlyValue;
+    });
+
+    const isLargerStorageValue = computed(() => {
+      return step2.value.planType === "Monthly"
+        ? step3.value.isLargerStorage.monthlyValue
+        : step3.value.isLargerStorage.yearlyValue;
+    });
+
+    const isCustomizableProfileValue = computed(() => {
+      return step2.value.planType === "Monthly"
+        ? step3.value.isCustomizableProfile.monthlyValue
+        : step3.value.isCustomizableProfile.yearlyValue;
+    });
+
+    const valueSufix = computed(() => {
+      return step2.value.planType === "Monthly" ? "mo" : "yr";
+    });
+
+    const onlineServiceCondition = computed(() => {
+      return `+$${isOnlineServiceValue.value}/${valueSufix.value}`;
+    });
+
+    const largerStorageCondition = computed(() => {
+      return `+$${isLargerStorageValue.value}/${valueSufix.value}`;
+    });
+
+    const customizableProfileCondition = computed(() => {
+      return `+$${isCustomizableProfileValue.value}/${valueSufix.value}`;
+    });
+
+    const totalPlan = computed(() => {
+      const isOnlineServiceValueFinal = step3.value.isOnlineService.isActive
+        ? isOnlineServiceValue.value
         : 0;
-      const isLargerStorageValue = this.step3.isLargerStorage.isActive
-        ? this.isLargerStorageValue
+      const isLargerStorageValueFinal = step3.value.isLargerStorage.isActive
+        ? isLargerStorageValue.value
         : 0;
-      const isCustomizableProfileValue = this.step3.isCustomizableProfile
+      const isCustomizableProfileValueFinal = step3.value.isCustomizableProfile
         .isActive
-        ? this.isCustomizableProfileValue
+        ? isCustomizableProfileValue.value
         : 0;
 
-      return `+$${
-        this.step2.value +
-        isOnlineServiceValue +
-        isLargerStorageValue +
-        isCustomizableProfileValue
-      }/${this.valueSufix}`;
-    },
-  },
-  methods: {
-    stepTo() {
-      this.$emit("stepTo", 2);
-    },
+      const somaTotal =
+        step2.value.value +
+        isOnlineServiceValueFinal +
+        isLargerStorageValueFinal +
+        isCustomizableProfileValueFinal;
+
+      return `+$${somaTotal}/${valueSufix.value}`;
+    });
+
+    const stepTo = () => {
+      emit("stepTo", 2);
+    };
+
+    return {
+      step2,
+      step3,
+      isOnlineServiceValue,
+      isLargerStorageValue,
+      isCustomizableProfileValue,
+      valueSufix,
+      onlineServiceCondition,
+      largerStorageCondition,
+      customizableProfileCondition,
+      totalPlan,
+      stepTo,
+    };
   },
 });
+
+// export default defineComponent({
+//   name: "IndexPage",
+//   computed: {
+//     ...mapState("Step", ["step1", "step2", "step3"]),
+//     isOnlineServiceValue() {
+//       return this.step2.planType === "Monthly"
+//         ? this.step3.isOnlineService.monthlyValue
+//         : this.step3.isOnlineService.yearlyValue;
+//     },
+//     isLargerStorageValue() {
+//       return this.step2.planType === "Monthly"
+//         ? this.step3.isLargerStorage.monthlyValue
+//         : this.step3.isLargerStorage.yearlyValue;
+//     },
+//     isCustomizableProfileValue() {
+//       return this.step2.planType === "Monthly"
+//         ? this.step3.isCustomizableProfile.monthlyValue
+//         : this.step3.isCustomizableProfile.yearlyValue;
+//     },
+//     valueSufix() {
+//       return this.step2.planType === "Monthly" ? "mo" : "yr";
+//     },
+//     onlineServiceCondition() {
+//       return `+$${this.isOnlineServiceValue}/${this.valueSufix}`;
+//     },
+//     largerStorageCondition() {
+//       return `+$${this.isLargerStorageValue}/${this.valueSufix}`;
+//     },
+//     customizableProfileCondition() {
+//       return `+$${this.isCustomizableProfileValue}/${this.valueSufix}`;
+//     },
+//     totalPlan() {
+//       const isOnlineServiceValue = this.step3.isOnlineService.isActive
+//         ? this.isOnlineServiceValue
+//         : 0;
+//       const isLargerStorageValue = this.step3.isLargerStorage.isActive
+//         ? this.isLargerStorageValue
+//         : 0;
+//       const isCustomizableProfileValue = this.step3.isCustomizableProfile
+//         .isActive
+//         ? this.isCustomizableProfileValue
+//         : 0;
+
+//       return `+$${
+//         this.step2.value +
+//         isOnlineServiceValue +
+//         isLargerStorageValue +
+//         isCustomizableProfileValue
+//       }/${this.valueSufix}`;
+//     },
+//   },
+//   methods: {
+//     stepTo() {
+//       this.$emit("stepTo", 2);
+//     },
+//   },
+// });
 </script>
 
 <style></style>

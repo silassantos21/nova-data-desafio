@@ -10,7 +10,7 @@
           <StepperComponent :actualStep="step" />
         </q-card-section>
         <q-card-section class="col-7 col-md-7">
-          <Step1Info @stepTo="stepTo" ref="step1" v-if="step === 1" />
+          <Step1Info @stepTo="stepTo" ref="step1Ref" v-if="step === 1" />
           <Step2Plan v-if="step === 2" />
           <Step3On v-if="step === 3" />
           <Step4Summary @stepTo="stepTo" v-if="step === 4" />
@@ -48,9 +48,10 @@
 
 <script>
 // @ is an alias to /src
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, nextTick, computed } from "vue";
 import { Loading } from "quasar";
-import { mapGetters, mapState, mapActions } from "vuex";
+// import { mapGetters, mapState, mapActions } from "vuex";
+import { useStore } from "vuex";
 import StepperComponent from "../components/StepperComponent.vue";
 import Step1Info from "../components/Step1Info.vue";
 import Step2Plan from "../components/Step2Plan.vue";
@@ -69,50 +70,68 @@ export default defineComponent({
     StepSucessful,
   },
   setup() {
-    return {
-      step: ref(1),
-    };
-  },
-  computed: {
-    ...mapState("Step", ["step1", "step2", "step3"]),
-    nextStep2Condition() {
-      return this.step === 2 && !this.step2.name;
-    },
-  },
-  methods: {
-    ...mapActions("Step", ["clearStep2", "clearStep3"]),
-    prevTo() {
-      if (this.step > 1) {
-        this.step -= 1;
-      }
-    },
-    async nextTo() {
-      if (this.step === 1) {
-        this.clearStep2();
-        await this.$nextTick();
-        this.$refs.step1.submitForm();
-      } else if (this.step === 2) {
-        this.clearStep3();
-        this.stepTo(3);
-      } else if (this.step === 3) {
-        this.stepTo(4);
-      } else if (this.step === 4) {
-        this.showLoadingWithMessage("Finalizando pedido...");
+    const store = useStore();
+
+    const step1Ref = ref(null);
+
+    const step2 = computed(() => {
+      return store.getters["Step/step2"];
+    });
+
+    const step = ref(1);
+
+    const nextStep2Condition = computed(() => {
+      return step.value === 2 && step2.value.name;
+    });
+
+    const nextTo = async () => {
+      if (step.value === 1) {
+        store.dispatch("Step/clearStep2");
+        await nextTick();
+        step1Ref.value.submitForm();
+      } else if (step.value === 2) {
+        store.dispatch("Step/clearStep3");
+        stepTo(3);
+      } else if (step.value === 3) {
+        stepTo(4);
+      } else if (step.value === 4) {
+        showLoadingWithMessage("Finalizando pedido...");
         setTimeout(() => {
-          this.stepTo(5);
-          this.hideLoading();
+          stepTo(5);
+          hideLoading();
         }, 2000);
       }
-    },
-    stepTo(step) {
-      this.step = step;
-    },
-    showLoadingWithMessage(message) {
+    };
+
+    const prevTo = () => {
+      if (step.value > 1) {
+        step.value -= 1;
+      }
+    };
+
+    const stepTo = (stepVal) => {
+      step.value = stepVal;
+    };
+
+    const showLoadingWithMessage = (message) => {
       return Loading.show({ message });
-    },
-    hideLoading() {
+    };
+
+    const hideLoading = () => {
       return Loading.hide();
-    },
+    };
+
+    return {
+      step1Ref,
+      step2,
+      step,
+      nextStep2Condition,
+      nextTo,
+      prevTo,
+      stepTo,
+      showLoadingWithMessage,
+      hideLoading,
+    };
   },
 });
 </script>
