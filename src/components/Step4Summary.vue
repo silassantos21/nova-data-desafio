@@ -166,64 +166,6 @@ export default defineComponent({
     };
   },
 });
-
-// export default defineComponent({
-//   name: "IndexPage",
-//   computed: {
-//     ...mapState("Step", ["step1", "step2", "step3"]),
-//     isOnlineServiceValue() {
-//       return this.step2.planType === "Monthly"
-//         ? this.step3.isOnlineService.monthlyValue
-//         : this.step3.isOnlineService.yearlyValue;
-//     },
-//     isLargerStorageValue() {
-//       return this.step2.planType === "Monthly"
-//         ? this.step3.isLargerStorage.monthlyValue
-//         : this.step3.isLargerStorage.yearlyValue;
-//     },
-//     isCustomizableProfileValue() {
-//       return this.step2.planType === "Monthly"
-//         ? this.step3.isCustomizableProfile.monthlyValue
-//         : this.step3.isCustomizableProfile.yearlyValue;
-//     },
-//     valueSufix() {
-//       return this.step2.planType === "Monthly" ? "mo" : "yr";
-//     },
-//     onlineServiceCondition() {
-//       return `+$${this.isOnlineServiceValue}/${this.valueSufix}`;
-//     },
-//     largerStorageCondition() {
-//       return `+$${this.isLargerStorageValue}/${this.valueSufix}`;
-//     },
-//     customizableProfileCondition() {
-//       return `+$${this.isCustomizableProfileValue}/${this.valueSufix}`;
-//     },
-//     totalPlan() {
-//       const isOnlineServiceValue = this.step3.isOnlineService.isActive
-//         ? this.isOnlineServiceValue
-//         : 0;
-//       const isLargerStorageValue = this.step3.isLargerStorage.isActive
-//         ? this.isLargerStorageValue
-//         : 0;
-//       const isCustomizableProfileValue = this.step3.isCustomizableProfile
-//         .isActive
-//         ? this.isCustomizableProfileValue
-//         : 0;
-
-//       return `+$${
-//         this.step2.value +
-//         isOnlineServiceValue +
-//         isLargerStorageValue +
-//         isCustomizableProfileValue
-//       }/${this.valueSufix}`;
-//     },
-//   },
-//   methods: {
-//     stepTo() {
-//       this.$emit("stepTo", 2);
-//     },
-//   },
-// });
 </script>
 
 <style></style>

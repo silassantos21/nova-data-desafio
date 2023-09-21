@@ -43,23 +43,6 @@
       :header-nav="step > 4"
     >
     </q-step>
-    <!-- <template v-slot:navigation>
-      <q-stepper-navigation>
-        <q-btn
-          @click="$refs.stepper.next()"
-          color="primary"
-          :label="step === 4 ? 'Confirm' : 'Next Step'"
-        />
-        <q-btn
-          v-if="step > 1"
-          flat
-          color="primary"
-          @click="$refs.stepper.previous()"
-          label="Go Back"
-          class="q-ml-sm"
-        />
-      </q-stepper-navigation>
-    </template> -->
   </q-stepper>
 </template>
 
@@ -80,14 +63,4 @@ export default defineComponent({
     };
   },
 });
-
-// export default {
-//   props: ["actualStep"],
-//   name: "StepperComponent",
-//   computed: {
-//     step() {
-//       return this.actualStep;
-//     },
-//   },
-// };
 </script>

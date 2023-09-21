@@ -172,43 +172,6 @@ export default defineComponent({
     };
   },
 });
-
-// export default defineComponent({
-//   name: "IndexPage",
-//   computed: {
-//     ...mapState("Step", ["step2"]),
-//     planType() {
-//       return this.step2.planType;
-//     },
-//     isOnlineService: {
-//       get() {
-//         return this.$store.getters["Step/step3isOnlineService"];
-//       },
-//       set(value) {
-//         const objValue = { value, prop: "isOnlineService" };
-//         this.$store.dispatch("Step/setStep3", objValue);
-//       },
-//     },
-//     isLargerStorage: {
-//       get() {
-//         return this.$store.getters["Step/step3isLargerStorage"];
-//       },
-//       set(value) {
-//         const objValue = { value, prop: "isLargerStorage" };
-//         this.$store.dispatch("Step/setStep3", objValue);
-//       },
-//     },
-//     isCustomizableProfile: {
-//       get() {
-//         return this.$store.getters["Step/step3isCustomizableProfile"];
-//       },
-//       set(value) {
-//         const objValue = { value, prop: "isCustomizableProfile" };
-//         this.$store.dispatch("Step/setStep3", objValue);
-//       },
-//     },
-//   },
-// });
 </script>
 
 <style></style>

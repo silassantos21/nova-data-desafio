@@ -200,64 +200,6 @@ export default defineComponent({
     };
   },
 });
-
-// export default defineComponent({
-//   name: "IndexPage",
-//   setup() {
-//     return {
-//       planType: ref("Monthly"),
-//       selectedPlan: ref(""),
-//       selectedIndex: ref(null),
-//       isStateChange: ref(false),
-//       plans,
-//     };
-//   },
-//   mounted() {
-//     this.setStatePlan();
-//   },
-//   watch: {
-//     planType() {
-//       if (!this.isStateChange) {
-//         this.selectedPlan = "";
-//         this.selectedIndex = null;
-//       } else {
-//         this.isStateChange = false;
-//       }
-//     },
-//     selectedPlanObject(newValue) {
-//       this.setStep2(newValue);
-//     },
-//   },
-//   computed: {
-//     ...mapState("Step", ["step2"]),
-//     selectedPlanObject() {
-//       const emptyPlanObject = {
-//         name: "",
-//         value: 0,
-//         freeMonths: 0,
-//         planType: "",
-//       };
-//       return plans[this.selectedIndex] ?? emptyPlanObject;
-//     },
-//   },
-//   methods: {
-//     ...mapActions("Step", ["setStep2"]),
-//     setStatePlan() {
-//       if (this.step2.name) {
-//         this.isStateChange = true;
-//         this.planType = this.step2.planType;
-//         const selectedIndex = plans.findIndex((item) => {
-//           return item.name === this.step2.name;
-//         });
-//         this.setPlan(this.step2.name, selectedIndex);
-//       }
-//     },
-//     setPlan(plan, index) {
-//       this.selectedPlan = plan;
-//       this.selectedIndex = index;
-//     },
-//   },
-// });
 </script>
 
 <style></style>
