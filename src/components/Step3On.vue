@@ -9,53 +9,15 @@
         >Add-ons help enhace your gaming experience.</span
       >
     </div>
-    <div class="flex flex-center row justify-around">
-      <!-- <template v-for="(plan, index) in plans" :key="index">
-        <q-card
-          v-if="planType === plan.planType"
-          :class="
-            'my-card-plan ' +
-            (selectedPlan === plan.name ? 'selected-plan' : '')
-          "
-          @click="setPlan(plan.name, index)"
-        >
-          <q-card-section>
-            <q-avatar>
-              <img
-                v-if="plan.name === 'Arcade'"
-                src="../assets/images/icon-arcade.svg"
-              />
-              <img
-                v-if="plan.name === 'Advanced'"
-                src="../assets/images/icon-advanced.svg"
-              />
-              <img
-                v-if="plan.name === 'Pro'"
-                src="../assets/images/icon-pro.svg"
-              />
-            </q-avatar>
-          </q-card-section>
-          <q-card-section>
-            <div class="text-indigo-10 text-subtitle1 text-bold">
-              {{ plan.name }}
-            </div>
-            <div caption class="text-grey-9">{{ `$${plan.value}/mo` }}</div>
-            <div
-              v-if="planType === 'Yearly'"
-              caption
-              class="text-indigo-10 text-bold"
-            >
-              {{ `${plan.freeMonths} months free` }}
-            </div>
-          </q-card-section>
-        </q-card>
-      </template> -->
+    <div class="flex flex-center row q-gutter-y-md">
       <q-card
-        :class="'col-12 ' + (isOnlineService === true ? 'selected-on' : '')"
+        :class="
+          'col-12 ' + (isOnlineService.isActive === true ? 'selected-on' : '')
+        "
       >
         <q-card-section horizontal>
           <q-card-section class="q-pa-md self-center">
-            <q-checkbox v-model="isOnlineService" />
+            <q-checkbox v-model="isOnlineService.isActive" />
           </q-card-section>
           <q-card-section>
             <div class="text-indigo-10 text-subtitle1 text-bold">
@@ -84,12 +46,12 @@
       <q-space />
       <q-card
         :class="
-          'col-12 q-my-md ' + (isLargerStorage === true ? 'selected-on' : '')
+          'col-12 ' + (isLargerStorage.isActive === true ? 'selected-on' : '')
         "
       >
         <q-card-section horizontal>
           <q-card-section class="q-pa-md self-center">
-            <q-checkbox v-model="isLargerStorage" />
+            <q-checkbox v-model="isLargerStorage.isActive" />
           </q-card-section>
           <q-card-section>
             <div class="text-indigo-10 text-subtitle1 text-bold">
@@ -117,12 +79,13 @@
       </q-card>
       <q-card
         :class="
-          'col-12 ' + (isCustomizableProfile === true ? 'selected-on' : '')
+          'col-12 ' +
+          (isCustomizableProfile.isActive === true ? 'selected-on' : '')
         "
       >
         <q-card-section horizontal>
           <q-card-section class="q-pa-md self-center">
-            <q-checkbox v-model="isCustomizableProfile" />
+            <q-checkbox v-model="isCustomizableProfile.isActive" />
           </q-card-section>
           <q-card-section>
             <div class="text-indigo-10 text-subtitle1 text-bold">
@@ -149,58 +112,47 @@
         </q-card-section>
       </q-card>
     </div>
-    <!-- <div class="q-mt-lg">
-      <q-banner class="bg-teal-1 banner-plan">
-        <span
-          :class="
-            (planType === 'Monthly' ? 'text-indigo-10' : 'text-grey-6') +
-            ' text-bold'
-          "
-          >Monthly</span
-        >
-        <q-toggle
-          v-model="planType"
-          color="primary"
-          false-value="Monthly"
-          true-value="Yearly"
-          keep-color
-          @update="resetSelectPlan"
-        />
-        <span
-          :class="
-            (planType === 'Yearly' ? 'text-indigo-10' : 'text-grey-6') +
-            ' text-bold'
-          "
-          >Yearly</span
-        >
-      </q-banner>
-    </div> -->
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import { defineComponent, ref } from "vue";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 export default defineComponent({
   name: "IndexPage",
-  setup() {
-    return {
-      planType: ref("Monthly"),
-      isOnlineService: ref(false),
-      isLargerStorage: ref(false),
-      isCustomizableProfile: ref(false),
-    };
-  },
-  watch: {
-    planType() {
-      this.selectedPlan = "";
-      this.selectedIndex = null;
-    },
-  },
   computed: {
-    selectedPlanObject() {
-      return plans[this.selectedIndex] ?? "";
+    ...mapState("Step", ["step2", "step3"]),
+    planType() {
+      return this.step2.planType;
+    },
+    isOnlineService: {
+      get() {
+        return this.$store.getters["Step/step3isOnlineService"];
+      },
+      set(value) {
+        const objValue = { value, prop: "isOnlineService" };
+        this.$store.dispatch("Step/setStep3", objValue);
+      },
+    },
+    isLargerStorage: {
+      get() {
+        return this.$store.getters["Step/step3isLargerStorage"];
+      },
+      set(value) {
+        const objValue = { value, prop: "isLargerStorage" };
+        this.$store.dispatch("Step/setStep3", objValue);
+      },
+    },
+    isCustomizableProfile: {
+      get() {
+        return this.$store.getters["Step/step3isCustomizableProfile"];
+      },
+      set(value) {
+        const objValue = { value, prop: "isCustomizableProfile" };
+        this.$store.dispatch("Step/setStep3", objValue);
+      },
     },
   },
 });

@@ -9,11 +9,13 @@
         >Please, provide your name, email address and phone number.</span
       >
     </div>
-    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
-      <div
-        class="row flex flex-left float-center text-left"
-        style="margin-bottom: -15px"
-      >
+    <q-form
+      ref="formStep1"
+      @submit="onSubmit"
+      @reset="onReset"
+      class="q-gutter-y-sm"
+    >
+      <div class="row flex flex-left float-center text-left">
         <span class="text-subtitle1 text-bold text-indigo-10"> Name </span>
       </div>
       <q-input
@@ -23,10 +25,7 @@
         placeholder="Ex: teste"
         :rules="[(val) => (val && val.length > 0) || 'Please type something']"
       />
-      <div
-        class="row flex flex-left float-center text-left"
-        style="margin-bottom: -15px"
-      >
+      <div class="row flex flex-left float-center text-left">
         <span class="text-subtitle1 text-bold text-indigo-10">
           Email Address
         </span>
@@ -38,10 +37,7 @@
         placeholder="Ex: teste@teste.com"
         :rules="[(val) => verificaEmailValidacoes(val)]"
       />
-      <div
-        class="row flex flex-left float-center text-left"
-        style="margin-bottom: -15px"
-      >
+      <div class="row flex flex-left float-center text-left">
         <span class="text-subtitle1 text-bold text-indigo-10">
           Phone Number
         </span>
@@ -63,17 +59,58 @@
 <script>
 // @ is an alias to /src
 import { defineComponent, ref } from "vue";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 export default defineComponent({
   name: "IndexPage",
   setup() {
     return {
-      name: ref(""),
-      email: ref(""),
-      phoneNumber: ref(""),
+      form: ref({
+        name: "",
+        email: "",
+        phoneNumber: "",
+      }),
     };
   },
+  computed: {
+    ...mapState("Step", ["step1", "step2", "step3"]),
+    name: {
+      get() {
+        return this.$store.getters["Step/step1Name"];
+      },
+      set(value) {
+        const objValue = { value, prop: "name" };
+        this.$store.dispatch("Step/setStep1", objValue);
+      },
+    },
+    email: {
+      get() {
+        return this.$store.getters["Step/step1Email"];
+      },
+      set(value) {
+        const objValue = { value, prop: "email" };
+        this.$store.dispatch("Step/setStep1", objValue);
+      },
+    },
+    phoneNumber: {
+      get() {
+        return this.$store.getters["Step/step1PhoneNumber"];
+      },
+      set(value) {
+        const objValue = { value, prop: "phoneNumber" };
+        this.$store.dispatch("Step/setStep1", objValue);
+      },
+    },
+  },
   methods: {
+    ...mapActions("Step", ["setStep1"]),
+    async submitForm() {
+      const response = await this.$refs.formStep1.validate();
+      if (response) {
+        this.$emit("stepTo", 2);
+      }
+    },
+    setStep1Func() {},
     verificaEmailValidacoes(email) {
       if (!this.validaEmail(email)) {
         return "Insira um e-mail válido";
@@ -86,7 +123,6 @@ export default defineComponent({
       return re.test(email);
     },
     validarCelular(celular) {
-      debugger;
       if (!celular || celular.length !== 11) {
         return "Esse campo deve possuir 11 dígitos";
       }

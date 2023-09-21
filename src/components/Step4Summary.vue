@@ -14,88 +14,46 @@
         <q-card-section horizontal>
           <q-card-section>
             <div class="text-indigo-10 text-subtitle1 text-bold">
-              Arcade(Monthly)
+              {{ `${step2.name}(${step2.planType})` }}
             </div>
-            <div caption class="text-grey-9 step-link">Change</div>
+            <div caption class="text-indigo-10 step-link" @click="stepTo">
+              Change
+            </div>
           </q-card-section>
           <q-card-section class="flex self-center margin-left-auto">
-            <div
-              v-if="planType === 'Monthly'"
-              caption
-              class="text-indigo-10 text-bold"
-            >
-              +$1/mo
-            </div>
-            <div
-              v-if="planType === 'Yearly'"
-              caption
-              class="text-indigo-10 text-bold"
-            >
-              +$10/yr
+            <div caption class="text-indigo-10 text-bold">
+              {{ `+$${step2.value}/${valueSufix}` }}
             </div>
           </q-card-section>
         </q-card-section>
         <q-separator inset />
-        <q-card-section horizontal v-if="isOnlineService">
+        <q-card-section horizontal v-if="step3.isOnlineService.isActive">
           <q-card-section>
             <div caption class="text-grey-9">Online Service</div>
           </q-card-section>
           <q-card-section class="flex self-center margin-left-auto">
-            <div
-              v-if="planType === 'Monthly'"
-              caption
-              class="text-subtitle2 text-indigo-10"
-            >
-              +$1/mo
-            </div>
-            <div
-              v-if="planType === 'Yearly'"
-              caption
-              class="text-subtitle2 text-indigo-10"
-            >
-              +$10/yr
+            <div caption class="text-subtitle2 text-indigo-10">
+              {{ onlineServiceCondition }}
             </div>
           </q-card-section>
         </q-card-section>
-        <q-card-section horizontal v-if="isLargerStorage">
+        <q-card-section horizontal v-if="step3.isLargerStorage.isActive">
           <q-card-section>
             <div caption class="text-grey-9">Larger storage</div>
           </q-card-section>
           <q-card-section class="flex self-center margin-left-auto">
-            <div
-              v-if="planType === 'Monthly'"
-              caption
-              class="text-subtitle2 text-indigo-10"
-            >
-              +$1/mo
-            </div>
-            <div
-              v-if="planType === 'Yearly'"
-              caption
-              class="text-subtitle2 text-indigo-10"
-            >
-              +$10/yr
+            <div caption class="text-subtitle2 text-indigo-10">
+              {{ largerStorageCondition }}
             </div>
           </q-card-section>
         </q-card-section>
-        <q-card-section horizontal v-if="isCustomizableProfile">
+        <q-card-section horizontal v-if="step3.isCustomizableProfile.isActive">
           <q-card-section>
             <div caption class="text-grey-9">Customizable profile</div>
           </q-card-section>
           <q-card-section class="flex self-center margin-left-auto">
-            <div
-              v-if="planType === 'Monthly'"
-              caption
-              class="text-subtitle2 text-indigo-10"
-            >
-              +$1/mo
-            </div>
-            <div
-              v-if="planType === 'Yearly'"
-              caption
-              class="text-subtitle2 text-indigo-10"
-            >
-              +$10/yr
+            <div caption class="text-subtitle2 text-indigo-10">
+              {{ customizableProfileCondition }}
             </div>
           </q-card-section>
         </q-card-section>
@@ -106,19 +64,8 @@
             <div caption class="text-grey-9">Total(per month)</div>
           </q-card-section>
           <q-card-section class="flex self-center margin-left-auto">
-            <div
-              v-if="planType === 'Monthly'"
-              caption
-              class="text-h6 text-indigo-10 text-bold"
-            >
-              +$1/mo
-            </div>
-            <div
-              v-if="planType === 'Yearly'"
-              caption
-              class="text-h6 text-indigo-10 text-bold"
-            >
-              +$10/yr
+            <div caption class="text-h6 text-indigo-10 text-bold">
+              {{ totalPlan }}
             </div>
           </q-card-section>
         </q-card-section>
@@ -130,90 +77,62 @@
 <script>
 // @ is an alias to /src
 import { defineComponent, ref } from "vue";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 export default defineComponent({
   name: "IndexPage",
-  setup() {
-    return {
-      planType: ref("Monthly"),
-      isOnlineService: ref(true),
-      isLargerStorage: ref(true),
-      isCustomizableProfile: ref(false),
-    };
-  },
-  watch: {
-    planType() {
-      this.selectedPlan = "";
-      this.selectedIndex = null;
-    },
-  },
   computed: {
-    selectedPlanObject() {
-      return plans[this.selectedIndex] ?? "";
+    ...mapState("Step", ["step1", "step2", "step3"]),
+    isOnlineServiceValue() {
+      return this.step2.planType === "Monthly"
+        ? this.step3.isOnlineService.monthlyValue
+        : this.step3.isOnlineService.yearlyValue;
+    },
+    isLargerStorageValue() {
+      return this.step2.planType === "Monthly"
+        ? this.step3.isLargerStorage.monthlyValue
+        : this.step3.isLargerStorage.yearlyValue;
+    },
+    isCustomizableProfileValue() {
+      return this.step2.planType === "Monthly"
+        ? this.step3.isCustomizableProfile.monthlyValue
+        : this.step3.isCustomizableProfile.yearlyValue;
+    },
+    valueSufix() {
+      return this.step2.planType === "Monthly" ? "mo" : "yr";
+    },
+    onlineServiceCondition() {
+      return `+$${this.isOnlineServiceValue}/${this.valueSufix}`;
+    },
+    largerStorageCondition() {
+      return `+$${this.isLargerStorageValue}/${this.valueSufix}`;
+    },
+    customizableProfileCondition() {
+      return `+$${this.isCustomizableProfileValue}/${this.valueSufix}`;
+    },
+    totalPlan() {
+      const isOnlineServiceValue = this.step3.isOnlineService.isActive
+        ? this.isOnlineServiceValue
+        : 0;
+      const isLargerStorageValue = this.step3.isLargerStorage.isActive
+        ? this.isLargerStorageValue
+        : 0;
+      const isCustomizableProfileValue = this.step3.isCustomizableProfile
+        .isActive
+        ? this.isCustomizableProfileValue
+        : 0;
+
+      return `+$${
+        this.step2.value +
+        isOnlineServiceValue +
+        isLargerStorageValue +
+        isCustomizableProfileValue
+      }/${this.valueSufix}`;
     },
   },
   methods: {
-    setPlan(plan, index) {
-      this.selectedPlan = plan;
-      this.selectedIndex = index;
-    },
-    verificaEmailValidacoes(email) {
-      if (!this.validaEmail(email)) {
-        return "Insira um e-mail válido";
-      }
-      return true;
-    },
-    validaEmail(email) {
-      var re =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(email);
-    },
-    validarCelular(celular) {
-      debugger;
-      if (!celular || celular.length !== 11) {
-        return "Esse campo deve possuir 11 dígitos";
-      }
-      if (
-        celular.substring(0, 2) === "00" ||
-        celular.substring(0, 2) === "01" ||
-        celular.substring(0, 2) === "02" ||
-        celular.substring(0, 2) === "03" ||
-        celular.substring(0, 2) === "04" ||
-        celular.substring(0, 2) === "05" ||
-        celular.substring(0, 2) === "06" ||
-        celular.substring(0, 2) === "07" ||
-        celular.substring(0, 2) === "08" ||
-        celular.substring(0, 2) === "09" ||
-        celular.substring(0, 2) === "10" ||
-        celular.substring(0, 2) === "20" ||
-        celular.substring(0, 2) === "23" ||
-        celular.substring(0, 2) === "25" ||
-        celular.substring(0, 2) === "26" ||
-        celular.substring(0, 2) === "29" ||
-        celular.substring(0, 2) === "30" ||
-        celular.substring(0, 2) === "36" ||
-        celular.substring(0, 2) === "39" ||
-        celular.substring(0, 2) === "40" ||
-        celular.substring(0, 2) === "50" ||
-        celular.substring(0, 2) === "52" ||
-        celular.substring(0, 2) === "56" ||
-        celular.substring(0, 2) === "57" ||
-        celular.substring(0, 2) === "58" ||
-        celular.substring(0, 2) === "59" ||
-        celular.substring(0, 2) === "60" ||
-        celular.substring(0, 2) === "70" ||
-        celular.substring(0, 2) === "72" ||
-        celular.substring(0, 2) === "76" ||
-        celular.substring(0, 2) === "78" ||
-        celular.substring(0, 2) === "80" ||
-        celular.substring(0, 2) === "90"
-      ) {
-        return "Insira um DDD válido.";
-      }
-      if (celular.substring(2, 3) !== "9") {
-        return "Depois do DDD, o número de celular deve começar com 9";
-      }
-      return true;
+    stepTo() {
+      this.$emit("stepTo", 2);
     },
   },
 });

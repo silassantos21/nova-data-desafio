@@ -39,7 +39,9 @@
             <div class="text-indigo-10 text-subtitle1 text-bold">
               {{ plan.name }}
             </div>
-            <div caption class="text-grey-9">{{ `$${plan.value}/mo` }}</div>
+            <div caption class="text-grey-9">
+              {{ `$${plan.value}/${planType === "Monthly" ? "mo" : "yr"}` }}
+            </div>
             <div
               v-if="planType === 'Yearly'"
               caption
@@ -83,21 +85,25 @@
 <script>
 // @ is an alias to /src
 import { defineComponent, ref } from "vue";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 const plans = [
   {
     name: "Arcade",
     value: 9,
+    freeMonths: null,
     planType: "Monthly",
   },
   {
     name: "Advanced",
     value: 12,
+    freeMonths: null,
     planType: "Monthly",
   },
   {
     name: "Pro",
     value: 15,
+    freeMonths: null,
     planType: "Monthly",
   },
   {
@@ -130,82 +136,53 @@ export default defineComponent({
       name: ref(""),
       email: ref(""),
       phoneNumber: ref(""),
+      isStateChange: ref(false),
       plans,
     };
   },
+  mounted() {
+    this.setStatePlan();
+  },
   watch: {
     planType() {
-      this.selectedPlan = "";
-      this.selectedIndex = null;
+      if (!this.isStateChange) {
+        this.selectedPlan = "";
+        this.selectedIndex = null;
+      } else {
+        this.isStateChange = false;
+      }
+    },
+    selectedPlanObject(newValue) {
+      this.setStep2(newValue);
     },
   },
   computed: {
+    ...mapState("Step", ["step2"]),
     selectedPlanObject() {
-      return plans[this.selectedIndex] ?? "";
+      const emptyPlanObject = {
+        name: "",
+        value: 0,
+        freeMonths: 0,
+        planType: "",
+      };
+      return plans[this.selectedIndex] ?? emptyPlanObject;
     },
   },
   methods: {
+    ...mapActions("Step", ["setStep2"]),
+    setStatePlan() {
+      if (this.step2.name) {
+        this.isStateChange = true;
+        this.planType = this.step2.planType;
+        const selectedIndex = plans.findIndex((item) => {
+          return item.name === this.step2.name;
+        });
+        this.setPlan(this.step2.name, selectedIndex);
+      }
+    },
     setPlan(plan, index) {
       this.selectedPlan = plan;
       this.selectedIndex = index;
-    },
-    verificaEmailValidacoes(email) {
-      if (!this.validaEmail(email)) {
-        return "Insira um e-mail válido";
-      }
-      return true;
-    },
-    validaEmail(email) {
-      var re =
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return re.test(email);
-    },
-    validarCelular(celular) {
-      debugger;
-      if (!celular || celular.length !== 11) {
-        return "Esse campo deve possuir 11 dígitos";
-      }
-      if (
-        celular.substring(0, 2) === "00" ||
-        celular.substring(0, 2) === "01" ||
-        celular.substring(0, 2) === "02" ||
-        celular.substring(0, 2) === "03" ||
-        celular.substring(0, 2) === "04" ||
-        celular.substring(0, 2) === "05" ||
-        celular.substring(0, 2) === "06" ||
-        celular.substring(0, 2) === "07" ||
-        celular.substring(0, 2) === "08" ||
-        celular.substring(0, 2) === "09" ||
-        celular.substring(0, 2) === "10" ||
-        celular.substring(0, 2) === "20" ||
-        celular.substring(0, 2) === "23" ||
-        celular.substring(0, 2) === "25" ||
-        celular.substring(0, 2) === "26" ||
-        celular.substring(0, 2) === "29" ||
-        celular.substring(0, 2) === "30" ||
-        celular.substring(0, 2) === "36" ||
-        celular.substring(0, 2) === "39" ||
-        celular.substring(0, 2) === "40" ||
-        celular.substring(0, 2) === "50" ||
-        celular.substring(0, 2) === "52" ||
-        celular.substring(0, 2) === "56" ||
-        celular.substring(0, 2) === "57" ||
-        celular.substring(0, 2) === "58" ||
-        celular.substring(0, 2) === "59" ||
-        celular.substring(0, 2) === "60" ||
-        celular.substring(0, 2) === "70" ||
-        celular.substring(0, 2) === "72" ||
-        celular.substring(0, 2) === "76" ||
-        celular.substring(0, 2) === "78" ||
-        celular.substring(0, 2) === "80" ||
-        celular.substring(0, 2) === "90"
-      ) {
-        return "Insira um DDD válido.";
-      }
-      if (celular.substring(2, 3) !== "9") {
-        return "Depois do DDD, o número de celular deve começar com 9";
-      }
-      return true;
     },
   },
 });

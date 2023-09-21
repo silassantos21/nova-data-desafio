@@ -11,6 +11,10 @@
   cursor: pointer;
 }
 
+.my-card-plan:hover {
+  background-color: #f1fffe;
+}
+
 .my-card-sucessful {
   width: 460px;
   min-height: 150px;
@@ -77,9 +81,27 @@
   height: 100% !important;
 }
 
+.border-radius-8 {
+  border-radius: 8px;
+}
+
 .sucessful-layout {
   height: 100%;
   display: flex;
+}
+
+.btn-step {
+  padding-inline: 16px;
+  padding-block: 10px;
+  border-radius: 8px;
+}
+
+.btn-step-next:hover {
+  background-color: #6259ff;
+}
+
+.btn-step-next:disabled {
+  background-color: #8e8e8f !important;
 }
 
 // .q-stepper__dot {
